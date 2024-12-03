@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library App</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/search">Search</a></li>
+        </ul>
+    </nav>
+    <script>
+        function filterBooks() {
+            var genre = document.getElementById('genre-filter').value;
+            var author = document.getElementById('author-filter').value;
+            var chelseyStatus = document.getElementById('chelsey-status-filter').value;
+            var jennyStatus = document.getElementById('jenny-status-filter').value;
+
+            var books = document.getElementsByClassName('book-item');
+            for (var i = 0; i < books.length; i++) {
+                var book = books[i];
+                var bookGenre = book.getAttribute('data-genre');
+                var bookAuthor = book.getAttribute('data-author');
+                var bookChelseyStatus = book.getAttribute('data-chelsey-status');
+                var bookJennyStatus = book.getAttribute('data-jenny-status');
+
+                // Show/hide books based on selected filter criteria
+                if ((genre === 'All' || genre === bookGenre) &&
+                    (author === 'All' || author === bookAuthor) &&
+                    (chelseyStatus === 'All' || chelseyStatus === bookChelseyStatus) &&
+                    (jennyStatus === 'All' || jennyStatus === bookJennyStatus)) {
+                    book.style.display = 'block';
+                } else {
+                    book.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Library Management</h1>
+
+    <!-- Filters -->
+    <div>
+        <label for="genre-filter">Filter by Genre:</label>
+        <select id="genre-filter" onchange="filterBooks()">
+            <option value="All">All</option>
+            {% for genre in genres %}
+            <option value="{{ genre }}">{{ genre }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="author-filter">Filter by Author:</label>
+        <select id="author-filter" onchange="filterBooks()">
+            <option value="All">All</option>
+            {% for author in authors %}
+            <option value="{{ author }}">{{ author }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="chelsey-status-filter">Filter by Chelsey Status:</label>
+        <select id="chelsey-status-filter" onchange="filterBooks()">
+            <option value="All">All</option>
+            {% for status in chelsey_statuses %}
+            <option value="{{ status }}">{{ status }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="jenny-status-filter">Filter by Jenny Status:</label>
+        <select id="jenny-status-filter" onchange="filterBooks()">
+            <option value="All">All</option>
+            {% for status in jenny_statuses %}
+            <option value="{{ status }}">{{ status }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Displaying Books -->
+    <h2>Book List</h2>
+    <ul>
+        {% for book in books %}
+        <li class="book-item" data-genre="{{ book['genre'] }}" data-author="{{ book['author'] }}"
+            data-chelsey-status="{{ book['chelsey_status'] }}" data-jenny-status="{{ book['jenny_status'] }}">
+            <strong>Title:</strong> {{ book['title'] }}<br>
+            <strong>Author:</strong> {{ book['author'] }}<br>
+            <strong>Genre:</strong> {{ book['genre'] }}<br>
+            <strong>Published Date:</strong> {{ book['published_date'] }}<br>
+            <strong>Description:</strong> {{ book['description'] }}<br>
+            <strong>ISBN:</strong>
+            {% for isbn in book['isbn_numbers'] %}
+                {{ isbn['type'] }}: {{ isbn['identifier'] }}<br>
+            {% endfor %}
+            <strong>Page Count:</strong> {{ book['page_count'] }}<br>
+            <strong>Ratings:</strong> {{ book['average_rating'] }} ({{ book['rating_count'] }} ratings)<br>
+            <strong>Maturity Rating:</strong> {{ book['maturity_rating'] }}<br>
+            <strong>Cover:</strong><br>
+            <img src="{{ book['cover_url'] }}" alt="Cover Image"><br>
+            <strong>Read Status:</strong> Chelsey - {{ book['chelsey_status'] }}, Jenny - {{ book['jenny_status'] }}
+            <form action="/delete/{{ book['title'] }}" method="GET" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+            <form action="/update/{{ book['title'] }}" method="POST" style="display:inline;">
+                <select name="chelsey_status">
+                    <option value="Read">Read</option>
+                    <option value="Unread">Unread</option>
+                </select>
+                <select name="jenny_status">
+                    <option value="Read">Read</option>
+                    <option value="Unread">Unread</option>
+                </select>
+                <button type="submit">Update</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

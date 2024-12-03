@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Search</title>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+    </nav>
+</head>
+<body>
+    <h1>Search for Books</h1>
+    <form method="get" action="{{ url_for('search') }}">
+        <input type="text" name="query" placeholder="Search by title, author, ISBN..." required>
+        <button type="submit">Search</button>
+    </form>
+    
+    {% if books %}
+        <h2>Results:</h2>
+        <ul>
+            {% for book in books %}
+            <li>
+                <strong>{{ book['volumeInfo'].get('title', 'No Title') }}</strong><br>
+                Author: {{ book['volumeInfo'].get('authors', ['Unknown'])[0] }}<br>
+                <img src="{{ book['volumeInfo'].get('imageLinks', {}).get('thumbnail', '') }}" alt="Book Cover"><br>
+                <form method="POST" action="{{ url_for('add_book_from_search') }}">
+                    <input type="hidden" name="title" value="{{ book['volumeInfo'].get('title', 'No Title') }}">
+                    <input type="hidden" name="author" value="{{ book['volumeInfo'].get('authors', ['Unknown'])[0] }}">
+                    <input type="hidden" name="genre" value="{{ ', '.join(book['volumeInfo'].get('categories', ['No Genre'])) }}">
+                    <input type="hidden" name="cover_url" value="{{ book['volumeInfo'].get('imageLinks', {}).get('thumbnail', '') }}">
+                    <input type="hidden" name="description" value="{{ book['volumeInfo'].get('description', 'No Description') }}">
+                    <input type="hidden" name="published_date" value="{{ book['volumeInfo'].get('publishedDate', 'Unknown') }}">
+                    <input type="hidden" name="page_count" value="{{ book['volumeInfo'].get('pageCount', 0) }}">
+                    <input type="hidden" name="average_rating" value="{{ book['volumeInfo'].get('averageRating', 'N/A') }}">
+                    <input type="hidden" name="rating_count" value="{{ book['volumeInfo'].get('ratingsCount', 0) }}">
+                    <input type="hidden" name="maturity_rating" value="{{ book['volumeInfo'].get('maturityRating', 'Unknown') }}">
+                    <input type="hidden" name="isbn_data" value="{{ book['volumeInfo'].get('industryIdentifiers', []) }}">
+                    <button type="submit">Add to Library</button>
+                </form>
+                
+            </li>
+            
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+</body>
+</html>
