@@ -20,26 +20,28 @@
         <h2>Results:</h2>
         <ul>
             {% for book in books %}
-    <li class="book-item" data-genre="{{ book['genre'] }}" data-author="{{ book['author'] }}"
-        data-chelsey-status="{{ book['chelsey_status'] }}" data-jenny-status="{{ book['jenny_status'] }}">
-        <strong>Title:</strong> {{ book['title'] }}<br>
-        <strong>Author:</strong> {{ book['author'] }}<br>
-        <strong>Genre:</strong> {{ book['genre'] }}<br>
-        <strong>Published Date:</strong> {{ book['published_date'] }}<br>
-        <strong>Description:</strong> {{ book['description'] }}<br>
-        <strong>ISBN:</strong>
-        {% for isbn in book['isbn_numbers'] %}
-            {{ isbn['type'] }}: {{ isbn['identifier'] }}<br>
-        {% endfor %}
-        <strong>Page Count:</strong> {{ book['page_count'] }}<br>
-        <strong>Ratings:</strong> {{ book['average_rating'] }} ({{ book['rating_count'] }} ratings)<br>
-        <strong>Maturity Rating:</strong> {{ book['maturity_rating'] }}<br>
-        <strong>Cover:</strong><br>
-        <img src="{{ book['cover_url'] }}" alt="Cover Image"><br>
-        <strong>Read Status:</strong> Chelsey - {{ book['chelsey_status'] }}, Jenny - {{ book['jenny_status'] }}
-    </li>
-{% endfor %}
-
+            <li>
+                <strong>{{ book['volumeInfo'].get('title', 'No Title') }}</strong><br>
+                Author: {{ book['volumeInfo'].get('authors', ['Unknown'])[0] }}<br>
+                <img src="{{ book['volumeInfo'].get('imageLinks', {}).get('thumbnail', '') }}" alt="Book Cover"><br>
+                <form method="POST" action="{{ url_for('add_book_from_search') }}">
+                    <input type="hidden" name="title" value="{{ book['volumeInfo'].get('title', 'No Title') }}">
+                    <input type="hidden" name="author" value="{{ book['volumeInfo'].get('authors', ['Unknown'])[0] }}">
+                    <input type="hidden" name="genre" value="{{ ', '.join(book['volumeInfo'].get('categories', ['No Genre'])) }}">
+                    <input type="hidden" name="cover_url" value="{{ book['volumeInfo'].get('imageLinks', {}).get('thumbnail', '') }}">
+                    <input type="hidden" name="description" value="{{ book['volumeInfo'].get('description', 'No Description') }}">
+                    <input type="hidden" name="published_date" value="{{ book['volumeInfo'].get('publishedDate', 'Unknown') }}">
+                    <input type="hidden" name="page_count" value="{{ book['volumeInfo'].get('pageCount', 0) }}">
+                    <input type="hidden" name="average_rating" value="{{ book['volumeInfo'].get('averageRating', 'N/A') }}">
+                    <input type="hidden" name="rating_count" value="{{ book['volumeInfo'].get('ratingsCount', 0) }}">
+                    <input type="hidden" name="maturity_rating" value="{{ book['volumeInfo'].get('maturityRating', 'Unknown') }}">
+                    <input type="hidden" name="isbn_data" value="{{ book['volumeInfo'].get('industryIdentifiers', []) }}">
+                    <button type="submit">Add to Library</button>
+                </form>
+                
+            </li>
+            
+            {% endfor %}
         </ul>
     {% else %}
         <p>No results found.</p>

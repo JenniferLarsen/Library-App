@@ -6,33 +6,20 @@ import requests
 from collections import Counter
 import json
 import os
-
 # Load environment variables from .env file
 load_dotenv()
-
 app = Flask(__name__)
-
 # MongoDB configuration using the MONGO_URI from the .env file
 mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
 db = client.library
 collection = db.books
-
 # Google Books API configuration using the API_KEY from the .env file
 API_KEY = os.getenv('GOOGLE_BOOKS_API_KEY')
-
 @app.route('/')
 def index():
     books = list(collection.find())
-    
-    # Get distinct values for filters
-    genres = list(collection.distinct('genre'))
-    authors = list(collection.distinct('author'))
-    chelsey_statuses = list(collection.distinct('chelsey_status'))
-    jenny_statuses = list(collection.distinct('jenny_status'))
-    
-    return render_template('index.html', books=books, genres=genres, authors=authors, chelsey_statuses=chelsey_statuses, jenny_statuses=jenny_statuses)
-
+    return render_template('index.html', books=books)
 @app.route('/add', methods=['POST'])
 def add_book():
     title = request.form['title']
@@ -40,17 +27,14 @@ def add_book():
     genre = request.form['genre']
     chelsey_status = request.form.get('chelsey_status', 'Unread')
     jenny_status = request.form.get('jenny_status', 'Unread')
-
     # Insert the book into MongoDB
     book = Book(title, author, genre, chelsey_status, jenny_status)
     collection.insert_one(book.to_dict())
     return redirect(url_for('index'))
-
 @app.route('/delete/<string:title>')
 def delete_book(title):
     collection.delete_one({"title": title})
     return redirect(url_for('index'))
-
 @app.route('/update/<string:title>', methods=['POST'])
 def update_book(title):
     chelsey_status = request.form['chelsey_status']
@@ -60,7 +44,6 @@ def update_book(title):
         {"$set": {"chelsey_status": chelsey_status, "jenny_status": jenny_status}}
     )
     return redirect(url_for('index'))
-
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
@@ -73,7 +56,6 @@ def search():
             books = result.get('items', [])
     
     return render_template('search.html', books=books)
-
 @app.route('/add_from_search', methods=['POST'])
 def add_book_from_search():
     title = request.form['title']
@@ -88,11 +70,9 @@ def add_book_from_search():
     maturity_rating = request.form.get('maturity_rating', 'Unknown')
     chelsey_status = request.form.get('chelsey_status', 'Unread')
     jenny_status = request.form.get('jenny_status', 'Unread')
-
     # Parse ISBN numbers
     isbn_data = request.form.get('isbn_data', '[]')  # Expect a JSON string of ISBN data
     isbn_list = eval(isbn_data) if isbn_data else []
-
     # Create book dictionary
     book = {
         "title": title,
@@ -109,11 +89,9 @@ def add_book_from_search():
         "chelsey_status": chelsey_status,
         "jenny_status": jenny_status
     }
-
     # Insert the book into MongoDB
     collection.insert_one(book)
     return redirect(url_for('index'))
-
 @app.route('/data/<string:attribute>')
 def data_by_attribute(attribute):
     books = list(collection.find())
@@ -132,8 +110,6 @@ def data_by_attribute(attribute):
     from collections import Counter
     aggregated_data = Counter(values)
     return jsonify(aggregated_data)
-
-
 def search_books(query):
     url = f'https://www.googleapis.com/books/v1/volumes?q={query}&key={API_KEY}'
     response = requests.get(url)
@@ -142,6 +118,5 @@ def search_books(query):
         return response.json()
     else:
         return None
-
 if __name__ == '__main__':
     app.run(debug=True)
