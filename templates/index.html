@@ -115,5 +115,105 @@
         </li>
         {% endfor %}
     </ul>
+
+<!-- Genre Chart -->
+<h2>Genre Distribution</h2>
+<canvas id="genreChart" width="400" height="200"></canvas>
+
+<!-- Author Chart -->
+<h2>Author Distribution</h2>
+<canvas id="authorChart" width="400" height="200"></canvas>
+
+<!-- Chelsey Status Chart -->
+<h2>Chelsey's Read Status</h2>
+<canvas id="chelseyStatusChart" width="400" height="200"></canvas>
+
+<!-- Jenny Status Chart -->
+<h2>Jenny's Read Status</h2>
+<canvas id="jennyStatusChart" width="400" height="200"></canvas>
+
+<script>
+    // Function to fetch chart data from Flask
+    async function fetchChartData() {
+        const response = await fetch('/chart_data');
+        const data = await response.json();
+
+        // Genre chart
+        const genreLabels = Object.keys(data.genre_counts);
+        const genreData = Object.values(data.genre_counts);
+
+        new Chart(document.getElementById('genreChart'), {
+            type: 'bar',
+            data: {
+                labels: genreLabels,
+                datasets: [{
+                    label: 'Genre Distribution',
+                    data: genreData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        // Author chart
+        const authorLabels = Object.keys(data.author_counts);
+        const authorData = Object.values(data.author_counts);
+
+        new Chart(document.getElementById('authorChart'), {
+            type: 'bar',
+            data: {
+                labels: authorLabels,
+                datasets: [{
+                    label: 'Author Distribution',
+                    data: authorData,
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        // Chelsey Status chart
+        const chelseyStatusLabels = Object.keys(data.chelsey_status_counts);
+        const chelseyStatusData = Object.values(data.chelsey_status_counts);
+
+        new Chart(document.getElementById('chelseyStatusChart'), {
+            type: 'pie',
+            data: {
+                labels: chelseyStatusLabels,
+                datasets: [{
+                    label: 'Chelsey Read Status',
+                    data: chelseyStatusData,
+                    backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        // Jenny Status chart
+        const jennyStatusLabels = Object.keys(data.jenny_status_counts);
+        const jennyStatusData = Object.values(data.jenny_status_counts);
+
+        new Chart(document.getElementById('jennyStatusChart'), {
+            type: 'pie',
+            data: {
+                labels: jennyStatusLabels,
+                datasets: [{
+                    label: 'Jenny Read Status',
+                    data: jennyStatusData,
+                    backgroundColor: ['rgba(255, 159, 64, 0.2)', 'rgba(75, 192, 192, 0.2)'],
+                    borderColor: ['rgba(255, 159, 64, 1)', 'rgba(75, 192, 192, 1)'],
+                    borderWidth: 1
+                }]
+            }
+        });
+    }
+
+    // Call the function to render the charts
+    fetchChartData();
+</script>
+
 </body>
 </html>

@@ -117,6 +117,37 @@ def data_by_attribute(attribute):
     from collections import Counter
     aggregated_data = Counter(values)
     return jsonify(aggregated_data)
+
+@app.route('/chart_data')
+def chart_data():
+    # Fetch data from MongoDB
+    books = list(collection.find())
+
+    # Aggregate genre data
+    genres = [genre for book in books for genre in book.get('genre', '').split(', ')]
+    genre_counts = Counter(genres)
+
+    # Aggregate author data
+    authors = [book.get('author', 'Unknown') for book in books]
+    author_counts = Counter(authors)
+
+    # Aggregate read statuses for Chelsey and Jenny
+    chelsey_statuses = [book.get('chelsey_status', 'Unread') for book in books]
+    chelsey_status_counts = Counter(chelsey_statuses)
+
+    jenny_statuses = [book.get('jenny_status', 'Unread') for book in books]
+    jenny_status_counts = Counter(jenny_statuses)
+
+    # Prepare the data for the charts
+    chart_data = {
+        "genre_counts": genre_counts,
+        "author_counts": author_counts,
+        "chelsey_status_counts": chelsey_status_counts,
+        "jenny_status_counts": jenny_status_counts
+    }
+
+    return jsonify(chart_data)
+
 def search_books(query):
     url = f'https://www.googleapis.com/books/v1/volumes?q={query}&key={API_KEY}'
     response = requests.get(url)
