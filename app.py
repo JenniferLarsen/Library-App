@@ -19,7 +19,14 @@ API_KEY = os.getenv('GOOGLE_BOOKS_API_KEY')
 @app.route('/')
 def index():
     books = list(collection.find())
-    return render_template('index.html', books=books)
+
+    # Fetch unique values for each filter
+    genres = list(collection.distinct('genre'))
+    authors = list(collection.distinct('author'))
+    chelsey_statuses = list(collection.distinct('chelsey_status'))
+    jenny_statuses = list(collection.distinct('jenny_status'))
+
+    return render_template('index.html', books=books, genres=genres, authors=authors, chelsey_statuses=chelsey_statuses, jenny_statuses=jenny_statuses)
 @app.route('/add', methods=['POST'])
 def add_book():
     title = request.form['title']

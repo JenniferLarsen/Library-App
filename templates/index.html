@@ -11,32 +11,32 @@
         </ul>
     </nav>
     <script>
+        // Function to apply filter logic
         function filterBooks() {
-    var genre = document.getElementById('genre-filter').value;
-    var author = document.getElementById('author-filter').value;
-    var chelseyStatus = document.getElementById('chelsey-status-filter').value;
-    var jennyStatus = document.getElementById('jenny-status-filter').value;
+            var genre = document.getElementById('genre-filter').value;
+            var author = document.getElementById('author-filter').value;
+            var chelseyStatus = document.getElementById('chelsey-status-filter').value;
+            var jennyStatus = document.getElementById('jenny-status-filter').value;
 
-    var books = document.getElementsByClassName('book-item');
-    for (var i = 0; i < books.length; i++) {
-        var book = books[i];
-        var bookGenre = book.getAttribute('data-genre');
-        var bookAuthor = book.getAttribute('data-author');
-        var bookChelseyStatus = book.getAttribute('data-chelsey-status');
-        var bookJennyStatus = book.getAttribute('data-jenny-status');
+            var books = document.getElementsByClassName('book-item');
+            for (var i = 0; i < books.length; i++) {
+                var book = books[i];
+                var bookGenre = book.getAttribute('data-genre');
+                var bookAuthor = book.getAttribute('data-author');
+                var bookChelseyStatus = book.getAttribute('data-chelsey-status');
+                var bookJennyStatus = book.getAttribute('data-jenny-status');
 
-        // Show/hide books based on selected filter criteria
-        if ((genre === 'All' || genre === bookGenre) &&
-            (author === 'All' || author === bookAuthor) &&
-            (chelseyStatus === 'All' || chelseyStatus === bookChelseyStatus) &&
-            (jennyStatus === 'All' || jennyStatus === bookJennyStatus)) {
-            book.style.display = 'block';
-        } else {
-            book.style.display = 'none';
+                // Show/hide books based on selected filter criteria
+                if ((genre === 'All' || genre === bookGenre) &&
+                    (author === 'All' || author === bookAuthor) &&
+                    (chelseyStatus === 'All' || chelseyStatus === bookChelseyStatus) &&
+                    (jennyStatus === 'All' || jennyStatus === bookJennyStatus)) {
+                    book.style.display = 'block';
+                } else {
+                    book.style.display = 'none';
+                }
+            }
         }
-    }
-}
-
     </script>
 </head>
 <body>
